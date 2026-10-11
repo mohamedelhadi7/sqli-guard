@@ -1,0 +1,38 @@
+name: checker
+
+# Runs the static multi-vulnerability checker and the test suite on every
+# push and pull request. Fails the build if checker.py flags anything in
+# the repo itself (outside the deliberately vulnerable sample/lab files)
+# or if a test fails.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install flask pytest
+
+      - name: Run test suite
+        run: python -m pytest tests -v
+
+      - name: Run benchmark corpus
+        run: python eval/benchmark.py
+
+      - name: Static checker on the library code
+        # Only checker.py/detector.py/signatures.py should be clean;
+        # samples/, lab/ and eval/benchmark_corpus.py contain
+        # deliberately vulnerable code used as test fixtures.
+        run: |
+          python checker.py checker.py
+          python checker.py detector.py
+          python checker.py signatures.py
