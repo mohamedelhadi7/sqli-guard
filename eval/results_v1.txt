@@ -1,0 +1,43 @@
+Attacks: 61   Normal inputs: 57
+
+Detection rate (recall): 50/61 = 82.0%
+False-alarm rate:        0/57 = 0.0%
+Precision:               50/50 = 100.0%
+
+Per attack category (caught/total):
+  auth_bypass              8/10
+  boolean                  5/6
+  boolean_blind            3/3
+  enumeration              4/4
+  error_based              3/3
+  evasion_case             1/1
+  evasion_char             1/1
+  evasion_comment          2/2
+  evasion_double_url       1/1
+  evasion_like             0/1
+  evasion_mysql_comment    0/1
+  evasion_operator         0/2
+  evasion_split_keyword    0/1
+  evasion_string_compare   0/1
+  evasion_url              2/2
+  evasion_whitespace       2/2
+  file_ops                 2/2
+  stacked                  5/5
+  subquery                 0/2
+  time_blind               5/5
+  union                    6/6
+
+MISSED attacks:
+  [auth_bypass] '" or ""="'
+  [auth_bypass] "') or ('1'='1"
+  [boolean] '1 or 2>1'
+  [evasion_mysql_comment] '1 /*!UNION*/ /*!SELECT*/ 1'
+  [evasion_split_keyword] '1 UN/**/ION SEL/**/ECT 1'
+  [evasion_operator] '1 || (SELECT 1)'
+  [evasion_like] "1 AND 'a' LIKE 'a'"
+  [evasion_string_compare] "1 OR 'a'>'A'"
+  [evasion_operator] "' || '1'='1"
+  [subquery] '1 and (select count(*) from users)>0'
+  [subquery] '1 and exists(select 1 from users)'
+
+FALSE ALARMS:
