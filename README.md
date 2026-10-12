@@ -43,6 +43,12 @@ and fails the build if anything regresses.
 **Full write-up:** [docs/REPORT.md](docs/REPORT.md) covers the design,
 evaluation method, results and limitations.
 
+## Demo
+
+![sqli-guard flagging four bug types in a sample file, then reporting nothing on the fixed version](docs/demo.svg)
+
+Recorded from `python checker.py samples/vulnerable_other.py` and `python checker.py samples/fixed_other.py`.
+
 ## How it works
 
 **Static checker.** Every finding is a *source* meeting a *sink*. A source
