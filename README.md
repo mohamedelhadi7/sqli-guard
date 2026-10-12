@@ -40,6 +40,39 @@ A GitHub Actions workflow (`.github/workflows/checker.yml`) runs the test
 suite, the benchmark, and the checker against its own source on every push,
 and fails the build if anything regresses.
 
+**Full write-up:** [docs/REPORT.md](docs/REPORT.md) covers the design,
+evaluation method, results and limitations.
+
+## How it works
+
+**Static checker.** Every finding is a *source* meeting a *sink*. A source
+is a value built from variable data (concatenation, f-string, `.format()`,
+`%`, `os.path.join()`); the checker marks the variable it is assigned to as
+tainted. A sink is a dangerous call (`execute`, `os.system`, `open`,
+`pickle.loads`, ...). When a sink receives tainted data, the checker reports
+the file, line, category, reason and fix.
+
+```mermaid
+flowchart LR
+    A[Python file] --> B[ast.parse]
+    B --> C[Walk each function]
+    C --> D[Assignments built from variables<br/>become tainted]
+    C --> E[Calls checked by 5 detectors]
+    D --> E
+    E --> F[Finding + suggested fix]
+```
+
+**Runtime detector.** Each request value is decoded twice, lowercased and
+stripped of SQL comments, then matched against 17 signatures stored in
+SQLite. Matches are logged to an `events` table; in `block` mode the request
+is refused.
+
+```mermaid
+flowchart LR
+    R[Request value] --> N[Normalise] --> M{17 signatures} -- match --> L[Log event] --> B[Monitor or block]
+    M -- no match --> OK[Allow]
+```
+
 ## Quick start
     pip install flask pytest
     python checker.py lab/app.py          # flags the vulnerable query
